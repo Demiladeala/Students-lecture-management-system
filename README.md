@@ -50,3 +50,4 @@ export default tseslint.config({
 ```
 # Lecture-Reminder-System
 # Students-lecture-management-system
+# Students-lecture-management-system
