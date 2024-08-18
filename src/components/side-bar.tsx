@@ -71,6 +71,25 @@ const Sidebar = () => {
                 </button>
             </div>
 
+            <div className="mt-6 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full">
+                    <motion.img
+                        src={image} 
+                        alt="profile img" 
+                        className="w-full h-full object-cover rounded-full border"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    />
+                </div>
+
+                <div>
+                    <h4 className="font-semibold">Emzzy</h4>
+                    <h3 className="text-sm">CSC/19/2945</h3>
+                    <h3 className="text-xs text-gray-400">500 level</h3>
+                </div>
+            </div>
+
             <div className="mt-6 w-full text-sm font-medium">
                 {links.map((link, index) => (
                     <a href={link.path} key={index} onClick={() => setIsMobileMenuOpen(false)}>
@@ -115,6 +134,7 @@ const Sidebar = () => {
             <div>
                 <h4 className="font-semibold">Emzzy</h4>
                 <h3 className="text-sm">CSC/19/2945</h3>
+                <h3 className="text-xs text-gray-400">500 level</h3>
             </div>
         </div>
 

@@ -105,7 +105,10 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
                                 </div>
                                 ))
                             ) : (
-                                <span className="text-gray-500 text-center">No classes</span>
+                                <span className="text-gray-500 pt-9 text-center my-auto
+                                font-semibold flex items-center justify-center">
+                                    No classes
+                                </span>
                             )}
                         </div>
                     </div>
