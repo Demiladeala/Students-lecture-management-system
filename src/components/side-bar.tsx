@@ -41,7 +41,7 @@ const Sidebar = () => {
     <>
     {/* Hamburger Button for Mobile */}
     <div className="lg:hidden fixed top-0 left-0 w-full 
-    flex items-center justify-between box-shadow p-2 bg-white z-30">
+    flex items-center justify-between box-shadow p-3 bg-white z-30">
         <div>
             <h3 className="poppins text-xl md:text-2xl 2xl:text-3xl font-bold text-primary-darkblue">CSC</h3>
             <h4 className="text-xs font-medium text-gray-500">Lecture Reminder System</h4>

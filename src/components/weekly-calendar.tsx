@@ -2,14 +2,17 @@ import { format, addDays } from "date-fns";
 
 export type ClassDetails = {
     name: string;
-    color: string;
     numStudents: number;
     time: string;
     subtitle: string;
   };
 
-export type WeekData = {
-    [day: string]: ClassDetails[];
+  export type WeekData = {
+    [day: string]: {
+      color: string;   
+      subColor: string;   
+      courses: ClassDetails[]; 
+    };
   };
 
   interface WeeklyCalendarProps {
@@ -38,18 +41,19 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
     const weekDates = generateWeekDates();
   
   return (
-    <div className="py-9 px-4 shadow rounded-2xl">
-        <h2 className="font-medium ">Courses For this Week</h2>
+    <div className="pt-4 pb-9 px-4 shadow rounded-2xl">
+        <h2 className="font-medium text-lg lg:text-xl mb-3 ">Courses For this Week</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {weekDates.map((date, index) => {
-            const dayName = format(date, "EEEE"); // e.g., 'Monday'
-            const dayNumber = format(date, "d");  // e.g., '18'
-            const isToday = index === 0;
-            const classesForDay = weekData[dayName] || [];
+             const dayName = format(date, "EEEE"); // e.g., 'Monday'
+             const dayNumber = format(date, "d");  // e.g., '18'
+             const isToday = index === 0;
+             const dayData = weekData[dayName] || { color: "", courses: [] };
+             const { color, subColor, courses } = dayData;
 
             return (
                 <div>
-                    <div key={index} className="p-4 border rounded-2xl">
+                    <div key={index} className="px-4 py-6 border rounded-2xl">
                         <div className="flex justify-between items-center">
                             <div className="font-bold text-lg">
                             {dayNumber}
@@ -64,25 +68,39 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
                             {dayName}
                         </div>
                         <div className="mt-2 text-sm font-medium">
-                            {classesForDay.length > 0 ? (
-                                <span>{classesForDay.length} class{classesForDay.length > 1 ? 'es' : ''}</span>
+                            {courses.length > 0 ? (
+                                <span>{courses.length} class{courses.length > 1 ? 'es' : ''}</span>
                             ) : (
                                 <span className="text-gray-500">No classes</span>
                             )}
                         </div>
                     </div>
 
-                    <div className={`mt-12 w-full relative py-9 px-2 border-l border-gray-200 ${weekDates.length === 7 && "border-r"}`}>
-                        <div className="absolute top-0 left-[50%] h-full border-[0.5px] border-gray-200"></div>
+                    <div className={`mt-12 w-full relative py-9 px-2 border-l border-gray-100 lg:border-gray-200 
+                        ${weekDates.length === 7 && "border-r"}`}>
+                        <div className="absolute top-0 left-[50%] h-full
+                         border-[0.5px] border-gray-100 lg:border-gray-200"></div>
 
-                        <div className="z-10 relative text-center">
-                            {classesForDay.length > 0 ? (
-                                classesForDay.map((course, i) => (
-                                <div key={i} className={`text-sm p-2 rounded mt-1 ${course.color}`}>
-                                    <div className="font-semibold">{course.name}</div>
-                                    <div className="text-xs text-gray-600">{course.subtitle}</div>
-                                    <div className="text-xs">{course.time}</div>
-                                    <div className="text-xs">Students: {course.numStudents}</div>
+                        <div className="z-10 relative">
+                            {courses.length > 0 ? (
+                                courses.map((course, i) => (
+                                <div key={i} className="flex flex-col -mb-3">
+                                    <div className={`z-10 relative space-y-1 text-sm px-2 py-3 rounded-xl mt-1 ${color}`}>
+                                        <div className="font-semibold text-lg">{course.name}</div>
+                                        <div className="text-xs text-gray-200">{course.subtitle}</div>
+                                        <div className="text-xs flex flex-wrap items-center gap-1">
+                                            <div className="w-6 h-6 rounded-full">
+                                                <img src="/profile-image-3.svg" 
+                                                alt="students" 
+                                                className="w-full h-full object-cover rounded-full border"/>
+                                            </div>
+                                            {course.numStudents} Students
+                                        </div>
+                                    </div>
+                                    <div className={`relative top-[-1rem] pt-5 pb-2 flex items-center justify-end
+                                         rounded-2xl mb-3 ${subColor}`}>
+                                        <div className="w-full text-xs text-center">{course.time}</div>
+                                    </div>
                                 </div>
                                 ))
                             ) : (
