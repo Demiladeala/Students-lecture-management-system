@@ -51,7 +51,9 @@ const Login = () => {
         //   });
     
             toast.success("Login successful!");
-            navigate('/dashboard');
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 1000)
             
         }  catch (error: any) {
         //   if (error.response) {
@@ -113,9 +115,12 @@ const Login = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`mt-1 outline-none w-full p-3 border border-primary-gray rounded-lg ${errors.email && 'border-red-500'}`}
+                        className={`outline-none w-full p-3 border border-primary-gray rounded-lg 
+                          ${errors.email && 'border-red-500'}`}
                         />
-                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                        <div className="h-4">
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                        </div>
                     </div>
 
                     <div className="mt-4">
@@ -125,9 +130,12 @@ const Login = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`mt-1 outline-none w-full p-3 border border-primary-gray rounded-lg ${errors.password && 'border-red-500'}`}
+                        className={`outline-none w-full p-3 border border-primary-gray rounded-lg 
+                          ${errors.password && 'border-red-500'}`}
                         />
-                        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                        <div className="h-4">
+                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+                        </div>
                     </div>
 
                     <button
