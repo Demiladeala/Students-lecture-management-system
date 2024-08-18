@@ -11,6 +11,7 @@ export type ClassDetails = {
     [day: string]: {
       color: string;   
       subColor: string;   
+      spacing: string;   
       courses: ClassDetails[]; 
     };
   };
@@ -49,7 +50,7 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
              const dayNumber = format(date, "d");  // e.g., '18'
              const isToday = index === 0;
              const dayData = weekData[dayName] || { color: "", courses: [] };
-             const { color, subColor, courses } = dayData;
+             const { color, subColor, spacing, courses } = dayData;
 
             return (
                 <div>
@@ -76,17 +77,17 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
                         </div>
                     </div>
 
-                    <div className={`mt-12 w-full relative py-9 px-2 border-l border-gray-100 lg:border-gray-200 
+                    <div className={`mt-12 w-full relative pt-1 pb-9 px-2 border-l border-gray-100 lg:border-gray-200 
                         ${weekDates.length === 7 && "border-r"}`}>
                         <div className="absolute top-0 left-[50%] h-full
                          border-[0.5px] border-gray-100 lg:border-gray-200"></div>
 
-                        <div className="z-10 relative">
+                        <div className={`z-10 relative ${spacing}`}>
                             {courses.length > 0 ? (
                                 courses.map((course, i) => (
                                 <div key={i} className="flex flex-col -mb-3">
                                     <div className={`z-10 relative space-y-1 text-sm px-2 py-3 rounded-xl mt-1 ${color}`}>
-                                        <div className="font-semibold text-lg">{course.name}</div>
+                                        <div className="font-semibold text-lg flex flex-wrap">{course.name}</div>
                                         <div className="text-xs text-gray-200">{course.subtitle}</div>
                                         <div className="text-xs flex flex-wrap items-center gap-1">
                                             <div className="w-6 h-6 rounded-full">
@@ -104,7 +105,7 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
                                 </div>
                                 ))
                             ) : (
-                                <span className="text-gray-500">No classes</span>
+                                <span className="text-gray-500 text-center">No classes</span>
                             )}
                         </div>
                     </div>

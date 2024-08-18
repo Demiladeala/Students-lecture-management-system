@@ -4,6 +4,7 @@ export const demoWeekData: WeekData = {
     Monday: {
       color: "bg-[#FF823F] text-gray-100",
       subColor:"bg-[#FFDAC5]",
+      spacing:"lg:mt-4",
       courses: [
         {
           name: "Math",
@@ -22,6 +23,7 @@ export const demoWeekData: WeekData = {
     Tuesday: {
       color: "bg-[#F5BB23] text-gray-100",
       subColor:"bg-[#FDEABD]",
+      spacing:"lg:mt-16",
       courses: [
         {
           name: "Science",
@@ -40,6 +42,7 @@ export const demoWeekData: WeekData = {
     Wednesday: {
       color: "bg-[#FFA7A7] text-gray-100",
       subColor:"bg-[#FFE5E6]",
+      spacing:"",
       courses: [
         {
           name: "Art",
@@ -58,6 +61,7 @@ export const demoWeekData: WeekData = {
     Thursday: {
       color: "bg-[#0DBDF6] text-gray-100",
       subColor:"bg-[#B7EBFC]",
+      spacing:"lg:mt-24",
       courses: [
         {
           name: "Math",
@@ -76,6 +80,7 @@ export const demoWeekData: WeekData = {
     Friday: {
       color: "bg-[#465361] text-gray-100",
       subColor:"bg-[#C7CBD1]",
+      spacing:"",
       courses: [
         {
           name: "English",
@@ -94,6 +99,7 @@ export const demoWeekData: WeekData = {
     Saturday: {
       color: "bg-[#15BE39] text-gray-100",
       subColor:"bg-[#BAECC4]",
+      spacing:"lg:mt-24",
       courses: [
         {
           name: "Programming",
@@ -106,6 +112,7 @@ export const demoWeekData: WeekData = {
     Sunday: {
       color: "bg-gray-100",
       subColor:"bg-gray-50",
+      spacing:"",
       courses: [], // No classes on Sunday
     },
   };
