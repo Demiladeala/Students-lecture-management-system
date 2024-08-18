@@ -11,6 +11,9 @@ export default {
           black: "#121212",
           gray2: "#363636",
         }
+      }, 
+      screens: {
+        lg: "1100px"
       }
     },
   },
