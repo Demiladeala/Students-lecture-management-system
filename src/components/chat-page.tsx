@@ -26,7 +26,7 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Sidebar with conversation list */}
-      <div className={`w-full ${selectedConversation !== null ? "hidden md:block" : "max-lg:h-screen"} 
+      <div className={`w-full ${selectedConversation !== null || userType === "student" ? "hidden lg:block" : "max-lg:h-screen"} 
       md:w-1/3 bg-gray-100 p-4 border-r`}>
         <h2 className="text-xl font-bold mb-4 mt-8">Messages</h2>
        {userType !== "student" ? <ul>
@@ -56,16 +56,23 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
            text-primary-black text-xl font-semibold">
            <div className="w-full h-[300px] mx-auto mb-7 flex items-center">
                 <img 
-                src="/chat-not-allowed.png" 
+                src="/chat-not-allowed.svg" 
                 alt="not-allowed" 
-                className="object-contain mx-auto mb-3"/>
+                className="w-[450px] object-contain mx-auto mb-3"/>
            </div>
             You can only chat with lecturers if you are the class representative.
           </div>
         )}
 
         {userType !== "student" && selectedConversation === null && (
-          <div className="p-4 bg-gray-50 h-screen flex items-center justify-center text-center">
+          <div className="p-4 bg-gray-50 h-screen flex flex-col gap-3 items-center justify-center text-center
+            text-primary-black text-xl font-semibold">
+            <div className="w-full h-[300px] mx-auto mb-7 flex items-center justify-center ">
+              <img 
+              src="/start-chat.svg" 
+              alt="not-allowed" 
+              className="w-[450px] object-contain mx-auto mb-3"/>
+           </div>
             Start chat
           </div>
         )}
@@ -76,10 +83,12 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
               .filter((message) => message.id === selectedConversation)
               .map((message) => (
                 <div key={message.id} className={`mb-4 ${message.senderType === "lecturer" ? "text-left" : "text-right"}`}>
-                  <div className={`inline-block p-2 rounded-lg ${message.senderType === "lecturer" ? "bg-blue-100" : "bg-green-100"}`}>
+                  <div className={`inline-block p-2 rounded-lg 
+                    ${message.senderType === "lecturer" ? "bg-gray-100" : "bg-primary-black/80 text-gray-100"}`}>
                     <div className="font-bold">{message.sender}</div>
                     <div>{message.content}</div>
-                    <div className="text-xs text-gray-500">{message.timestamp}</div>
+                    <div className={` text-xs ${message.senderType === "lecturer" ? "text-gray-500" : "text-gray-200"} `}>
+                      {message.timestamp}</div>
                   </div>
                 </div>
               ))}
@@ -91,7 +100,7 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
                 placeholder="Type your message..."
                 className="flex-1 p-2 border rounded-lg"
                 />
-                <button className="ml-2 p-2 bg-blue-500 text-white rounded-lg">Send</button>
+                <button className="ml-2 p-2 bg-primary-black text-white rounded-lg">Send</button>
             </div>
             ) : null}
           </div>

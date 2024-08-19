@@ -117,3 +117,31 @@ export const demoWeekData: WeekData = {
     },
   };
   
+
+  // export const calendarDemoWeekData: CalendarWeekData = {
+  //   Monday: [
+  //     { title: "Mathematics 101", time: "8:00 AM - 9:30 AM", students: 25, subtitle: "Lecture Hall A" },
+  //     { title: "Physics 201", time: "10:00 AM - 11:30 AM", students: 30, subtitle: "Lecture Hall B" },
+  //   ],
+  //   Tuesday: [
+  //     { title: "Chemistry 101", time: "9:00 AM - 10:30 AM", students: 20, subtitle: "Lab C" },
+  //     { title: "Biology 102", time: "11:00 AM - 12:30 PM", students: 22, subtitle: "Lecture Hall A" },
+  //   ],
+  //   Wednesday: [
+  //     { title: "History 101", time: "8:00 AM - 9:00 AM", students: 28, subtitle: "Lecture Hall D" },
+  //     { title: "English 201", time: "9:30 AM - 11:00 AM", students: 32, subtitle: "Lecture Hall B" },
+  //   ],
+  //   Thursday: [
+  //     { title: "Computer Science 101", time: "10:00 AM - 11:30 AM", students: 35, subtitle: "Lab E" },
+  //     { title: "Mathematics 102", time: "1:00 PM - 2:30 PM", students: 25, subtitle: "Lecture Hall A" },
+  //   ],
+  //   Friday: [
+  //     { title: "Physics 202", time: "9:00 AM - 10:30 AM", students: 30, subtitle: "Lecture Hall B" },
+  //     { title: "Chemistry 102", time: "11:00 AM - 12:30 PM", students: 20, subtitle: "Lab C" },
+  //   ],
+  //   Saturday: [
+  //     { title: "Biology 201", time: "10:00 AM - 11:30 AM", students: 22, subtitle: "Lecture Hall A" },
+  //   ],
+  //   Sunday: [],
+  // };
+  
