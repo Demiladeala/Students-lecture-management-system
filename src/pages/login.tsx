@@ -129,6 +129,7 @@ const Login = () => {
                 <input
                   type="text"
                   name="email"
+                  placeholder={isLecturer ? "Enter your email" : "e.g csc/00/5000"}
                   value={formData.email}
                   onChange={handleChange}
                   className={`outline-none w-full p-3 border border-primary-gray rounded-lg ${
