@@ -7,7 +7,7 @@ const Home = () => {
     <main className="relative container w-full mx-auto max-w-[2800px] scroll-smooth">
         <Sidebar/>
         <Layout noPadding={true}>
-            <ChatPage userType="student" />
+            <ChatPage userType="lecturer" />
         </Layout>
     </main>
   )
