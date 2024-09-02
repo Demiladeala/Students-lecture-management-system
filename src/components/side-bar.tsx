@@ -94,7 +94,7 @@ const Sidebar = () => {
                     />
                 </div>
 
-               {userRole === "Student" ? <div>
+               {userRole === "student" ? <div>
                     <h4 className="font-semibold">Emzzy</h4>
                     <h3 className="text-sm">CSC/19/2945</h3>
                     <h3 className="text-xs text-gray-400">500 level</h3>
@@ -145,7 +145,7 @@ const Sidebar = () => {
                 />
             </div>
 
-               {userRole === "Student" ? <div>
+               {userRole === "student" ? <div>
                     <h4 className="font-semibold">Emzzy</h4>
                     <h3 className="text-sm">CSC/19/2945</h3>
                     <h3 className="text-xs text-gray-400">500 level</h3>
