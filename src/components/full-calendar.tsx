@@ -48,11 +48,11 @@ const CalendarComponent = () => {
     }}
     eventContent={(eventInfo) => (
       <div className="event-box" style={{ backgroundColor: eventInfo.event.backgroundColor }}>
-        <span>{eventInfo.event.title}</span>
+        <span className=''>{eventInfo.event.title}</span>
       </div>
     )}
-    eventBackgroundColor="transparent" // Ensures the color from eventContent is applied
-    height="auto" // Makes the calendar height responsive
+    eventBackgroundColor="transparent"
+    height="auto" 
   />
   );
 };
