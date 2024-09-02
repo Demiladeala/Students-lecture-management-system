@@ -34,7 +34,7 @@ const UploadForm = () => {
             });
 
             if (response.ok) {
-                const data = await response.json();
+                // const data = await response.json();
                 toast.success("Course uploaded successfully!");
                 // Optionally, reset the form
                 setCourseData({
