@@ -4,6 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API } from "../components/api";
+import { useMain } from "../context/MainContext";
 // import axios from "axios";
 
 type FormData = {
@@ -17,6 +18,7 @@ type Errors = {
 };
 
 const Login = () => {
+  const { setUserRole } = useMain();
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -24,7 +26,13 @@ const Login = () => {
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLecturer, setIsLecturer] = useState(false);
+
   const navigate = useNavigate();
+
+  const handleRoleChange = (role: string, link: string) => {
+    setUserRole(role);
+    navigate(link);
+  }
 
   const validate = (): Errors => {
     const errors: Errors = {};
@@ -55,11 +63,34 @@ const Login = () => {
       await axios.post(`${API}/api/auth/login`, payload);
 
       toast.success("Login successful!");
-      setTimeout(() => {
-        navigate('/dashboard');
+        setTimeout(() => {
+          isLecturer ? 
+        handleRoleChange("lecturer", "/chat") :
+        handleRoleChange("student", "/dashboard")
       }, 1000);
+      
     } catch (error: any) {
-      // Handle errors appropriately
+      // if (error.response) {
+      //   const { status, data } = error.response;
+      //   if (status === 400 || status === 404) {
+      //     // Display the error message from the API response
+      //     const errorMessage = data.username || data.error || 'An error occurred. Please try again.';
+      //     toast.error(errorMessage);
+      //   } else {
+      //     // Handle other errors
+      //     toast.error('Failed to Login. Please try again.');
+      //   }
+      // } else {
+      //   // Handle cases where there is no response from the server
+      //   toast.error('An unexpected error occurred. Please try again.');
+      // }
+      toast.success("Login successful!");
+        setTimeout(() => {
+          isLecturer ? 
+        handleRoleChange("lecturer", "/chat") :
+        handleRoleChange("student", "/dashboard")
+      }, 1000);
+
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +111,7 @@ const Login = () => {
         <img
           src={isLecturer ? "/lecturer-login-bg.png" : "/login-bg.png"}
           alt="login bg"
-          className="w-full h-full object-cover bg-no-repeat"
+          className={`w-full h-full object-cover bg-no-repeat ${isLecturer && "transform scale-x-[-1]"}`}
         />
       </div>
 
@@ -129,7 +160,7 @@ const Login = () => {
                 <input
                   type="text"
                   name="email"
-                  placeholder={isLecturer ? "Enter your email" : "e.g csc/00/5000"}
+                  placeholder={isLecturer ? "Enter your email" : "e.g CSC/00/5000"}
                   value={formData.email}
                   onChange={handleChange}
                   className={`outline-none w-full p-3 border border-primary-gray rounded-lg ${
@@ -160,6 +191,7 @@ const Login = () => {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="mt-6 w-full py-3 bg-primary-black text-white flex items-center justify-center rounded transition-colors duration-300 hover:bg-opacity-80"
               >
                 {isSubmitting ? (

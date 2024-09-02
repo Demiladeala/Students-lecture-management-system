@@ -1,29 +1,26 @@
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import { FaBook, FaRegCalendarAlt } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LiaHomeSolid } from "react-icons/lia";
-import { useState } from "react";
+import {  useState } from "react";
 import { ImBooks } from "react-icons/im";
 import { TiMessages } from "react-icons/ti";
 import { LuTimer } from "react-icons/lu";
-
-export const links = [
-    { path: '/dashboard', label: 'Overview', icon: <LiaHomeSolid size={24} /> },
-    { path: '/calendar', label: 'Calendar', icon: <FaRegCalendarAlt size={24}/> },
-    { path: '/courses', label: 'Courses', icon: <ImBooks size={24}/> },
-    { path: '/chat', label: 'Messages', icon: <TiMessages size={24}/> },
-    { path: '/timetable', label: 'Timetable', icon: <LuTimer size={24}/> },
-    { path: '/settings', label: 'Settings', icon: <IoSettingsOutline size={24}/> },
-];
+import { useMain } from "../context/MainContext";
 
 const image = "profile-image-1.png";
 
 const Sidebar = () => {
+    const { userRole, loading } = useMain();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     // const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
-    
+
+    if (loading) {
+        return null; // Don't render the sidebar while loading
+      }
+
     // useEffect(() => {
     //     const interval = setInterval(() => {
     //         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -36,6 +33,20 @@ const Sidebar = () => {
         `w-full flex items-center gap-2 transition-all duration-300 py-3 px-4 rounded-lg ${
         location.pathname === path ? "bg-primary-gray2 text-white" : "text-gray-600 lg:text-gray-400 hover:text-gray-100"
     }`;
+
+     const links = userRole === "registration-officer" || userRole === "lecturer"
+    ? [
+        { path: '/chat', label: 'Messages', icon: <TiMessages size={24} /> },
+        { path: '/upload-courses', label: 'Upload Courses', icon: <FaBook size={24} /> },
+    ]
+    : [
+        { path: '/dashboard', label: 'Overview', icon: <LiaHomeSolid size={24} /> },
+        { path: '/calendar', label: 'Calendar', icon: <FaRegCalendarAlt size={24}/> },
+        { path: '/courses', label: 'Courses', icon: <ImBooks size={24}/> },
+        { path: '/chat', label: 'Messages', icon: <TiMessages size={24}/> },
+        { path: '/timetable', label: 'Timetable', icon: <LuTimer size={24}/> },
+        { path: '/settings', label: 'Settings', icon: <IoSettingsOutline size={24}/> },
+    ];
 
   return (
     <>
@@ -83,11 +94,14 @@ const Sidebar = () => {
                     />
                 </div>
 
-                <div>
+               {userRole === "Student" ? <div>
                     <h4 className="font-semibold">Emzzy</h4>
                     <h3 className="text-sm">CSC/19/2945</h3>
                     <h3 className="text-xs text-gray-400">500 level</h3>
-                </div>
+                </div> :
+                <div>
+                    <h4>Mr. Lecturer</h4>    
+                </div>}
             </div>
 
             <div className="mt-6 w-full text-sm font-medium">
@@ -131,11 +145,14 @@ const Sidebar = () => {
                 />
             </div>
 
-            <div>
-                <h4 className="font-semibold">Emzzy</h4>
-                <h3 className="text-sm">CSC/19/2945</h3>
-                <h3 className="text-xs text-gray-400">500 level</h3>
-            </div>
+               {userRole === "Student" ? <div>
+                    <h4 className="font-semibold">Emzzy</h4>
+                    <h3 className="text-sm">CSC/19/2945</h3>
+                    <h3 className="text-xs text-gray-400">500 level</h3>
+                </div> :
+                <div>
+                    <h4>Mr. Lecturer</h4>    
+                </div>}
         </div>
 
         <div className="mt-16 w-[90%] mx-auto text-sm font-medium">

@@ -53,8 +53,8 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
              const { color, subColor, spacing, courses } = dayData;
 
             return (
-                <div>
-                    <div key={index} className="px-4 py-6 border rounded-2xl">
+                <div key={index}>
+                    <div className="px-4 py-6 border rounded-2xl">
                         <div className="flex justify-between items-center">
                             <div className="font-bold text-lg">
                             {dayNumber}

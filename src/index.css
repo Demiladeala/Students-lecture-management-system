@@ -14,3 +14,52 @@
 .box-shadow {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
 }
+
+/* Custom styles for FullCalendar */
+.fc .fc-toolbar-title {
+    font-size: 1.25rem; /* Adjust title size for better readability */
+  }
+  
+  .fc-toolbar.fc-header-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  
+  .fc-toolbar.fc-header-toolbar .fc-left,
+  .fc-toolbar.fc-header-toolbar .fc-center,
+  .fc-toolbar.fc-header-toolbar .fc-right {
+    flex-basis: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .fc-toolbar.fc-header-toolbar .fc-left {
+    order: 1;
+  }
+  
+  .fc-toolbar.fc-header-toolbar .fc-center {
+    order: 2;
+  }
+  
+  .fc-toolbar.fc-header-toolbar .fc-right {
+    order: 3;
+  }
+  
+  /* Hide less important buttons on small screens */
+  @media (max-width: 768px) {
+    .fc-toolbar.fc-header-toolbar .fc-right {
+      display: none; /* Hide the view buttons (day, week, month) on smaller screens */
+    }
+  
+    .fc-toolbar.fc-header-toolbar .fc-left {
+      text-align: center;
+      order: 2; /* Show navigation controls and today's date in the center */
+    }
+  
+    .fc-toolbar.fc-header-toolbar .fc-center {
+      order: 1; /* Move the title to the top */
+    }
+  }
+  

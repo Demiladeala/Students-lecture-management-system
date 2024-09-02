@@ -6,6 +6,7 @@ import Courses from "./pages/courses"
 import Chat from "./pages/chat"
 import Timetable from "./pages/timetable"
 import Settings from "./pages/settings"
+import Upload from "./pages/upload-courses"
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/chat" element={<Chat/>} />
         <Route path="/timetable" element={<Timetable/>} />
         <Route path="/settings" element={<Settings/>} />
+        <Route path="/upload-courses" element={<Upload/>} />
       </Routes>
   </main>
   )
