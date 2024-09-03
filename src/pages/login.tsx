@@ -61,13 +61,12 @@ const Login = () => {
         password: formData.password,
       };
       await axios.post(`${API}/api/auth/login`, payload, {
-        withCredentials: true
+        withCredentials: true,
       });
 
-      // Fetch the current user details
-        const userDetailsResponse = await axios.get(`${API}/api/users/me`, {
-          withCredentials: true
-        });
+    const userDetailsResponse = await axios.get(`${API}/api/users/me`, {
+      withCredentials: true,
+    });
 
       // Assuming user details are retrieved successfully
       const userDetails = userDetailsResponse.data;
