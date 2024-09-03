@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Layout from "./layout";
 import { API } from "./api";
+import * as XLSX from "xlsx";
 
 const UploadForm = () => {
     const [courseData, setCourseData] = useState({
@@ -13,6 +14,8 @@ const UploadForm = () => {
         start_time: "",
         end_time: "",
     });
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -24,41 +27,74 @@ const UploadForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        await uploadCourse(courseData);
+    };
+
+    const uploadCourse = async (course: any) => {
         try {
             const response = await fetch(`${API}/api/courses`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(courseData),
+                body: JSON.stringify(course),
             });
 
             if (response.ok) {
-                // const data = await response.json();
-                toast.success("Course uploaded successfully!");
-                // Optionally, reset the form
-                setCourseData({
-                    name: "",
-                    code: "",
-                    level: 100,
-                    day: "MON",
-                    venue: "",
-                    start_time: "",
-                    end_time: "",
-                });
+                toast.success(`Course ${course.name} uploaded successfully!`);
             } else {
                 const errorData = await response.json();
-                toast.error(`Failed to upload course: ${errorData.message}`);
+                toast.error(`Failed to upload course ${course.name}: ${errorData.message}`);
             }
         } catch (error) {
-            toast.error("An error occurred. Please try again.");
+            toast.error(`An error occurred while uploading course ${course.name}. Please try again.`);
         }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const data = event.target?.result;
+            const workbook = XLSX.read(data, { type: "binary" });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const courses = XLSX.utils.sheet_to_json(worksheet);
+
+            setIsUploading(true);
+            setUploadProgress(0);
+
+            for (let i = 0; i < courses.length; i++) {
+                await uploadCourse(courses[i]);
+                setUploadProgress(((i + 1) / courses.length) * 100);
+            }
+
+            setIsUploading(false);
+            toast.success("All courses uploaded successfully!");
+        };
+        reader.readAsBinaryString(file);
     };
 
     return (
         <Layout>
-            <h1 className="text-2xl font-bold mb-4">Upload Course</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <h1 className="text-2xl font-bold mb-4">Upload Course/ File</h1>
+
+            <div className="mt-6 mb-16 py-10 px-2 border border-dashed border-black rounded-xl">
+                <label className="block font-semibold text-lg">Upload Excel File</label>
+                <label className="block font-semibold text-sm">Arrange in this format ("name"; "code"; "level"; "day"; 
+                "venue"; "start_time"; "end_time";)</label>
+                <input
+                    type="file"
+                    accept=".xlsx, .xls"
+                    onChange={handleFileUpload}
+                    className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
+                />
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4 pb-12">
+                <label className="block font-semibold text-lg">Upload Course</label>
                 <div>
                     <label className="block text-sm font-medium">Course Name</label>
                     <input
@@ -148,10 +184,16 @@ const UploadForm = () => {
                     Upload Course
                 </button>
             </form>
+
+            {isUploading && (
+                <div className="mt-4 mb-9">
+                    <p>Uploading courses... {uploadProgress}%</p>
+                </div>
+            )}
+
             <Toaster />
         </Layout>
     );
 };
 
 export default UploadForm;
-

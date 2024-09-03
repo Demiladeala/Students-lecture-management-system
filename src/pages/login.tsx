@@ -60,36 +60,41 @@ const Login = () => {
         username: formData.email,
         password: formData.password,
       };
-      await axios.post(`${API}/api/auth/login`, payload);
+      await axios.post(`${API}/api/auth/login`, payload, {
+        withCredentials: true
+      });
+
+      // Fetch the current user details
+        const userDetailsResponse = await axios.get(`${API}/api/users/me`, {
+          withCredentials: true
+        });
+
+      // Assuming user details are retrieved successfully
+      const userDetails = userDetailsResponse.data;
+        sessionStorage.setItem('userDetails', JSON.stringify(userDetails));
 
       toast.success("Login successful!");
         setTimeout(() => {
           isLecturer ? 
         handleRoleChange("lecturer", "/chat") :
         handleRoleChange("student", "/dashboard")
-      }, 1000);
+      }, 200);
       
     } catch (error: any) {
-      // if (error.response) {
-      //   const { status, data } = error.response;
-      //   if (status === 400 || status === 404) {
-      //     // Display the error message from the API response
-      //     const errorMessage = data.username || data.error || 'An error occurred. Please try again.';
-      //     toast.error(errorMessage);
-      //   } else {
-      //     // Handle other errors
-      //     toast.error('Failed to Login. Please try again.');
-      //   }
-      // } else {
-      //   // Handle cases where there is no response from the server
-      //   toast.error('An unexpected error occurred. Please try again.');
-      // }
-      toast.success("Login successful!");
-        setTimeout(() => {
-          isLecturer ? 
-        handleRoleChange("lecturer", "/chat") :
-        handleRoleChange("student", "/dashboard")
-      }, 1000);
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 400 || status === 404) {
+          // Display the error message from the API response
+          const errorMessage = data.username || data.error || 'An error occurred. Please try again.';
+          toast.error(errorMessage);
+        } else {
+          // Handle other errors
+          toast.error('Failed to Login. Please try again.');
+        }
+      } else {
+        // Handle cases where there is no response from the server
+        toast.error('An unexpected error occurred. Please try again.');
+      }
 
     } finally {
       setIsSubmitting(false);
