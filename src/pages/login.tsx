@@ -84,7 +84,7 @@ const Login = () => {
         const { status, data } = error.response;
         if (status === 400 || status === 404) {
           // Display the error message from the API response
-          const errorMessage = data.username || data.error || 'An error occurred. Please try again.';
+          const errorMessage = data.username || data.error || data.detail || 'An error occurred. Please try again.';
           toast.error(errorMessage);
         } else {
           // Handle other errors

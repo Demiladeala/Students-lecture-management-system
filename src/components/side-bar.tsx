@@ -150,7 +150,11 @@ const Sidebar = () => {
     <div className="pt-12 lg:hidden"></div>
 
     <div className="z-[3] fixed max-lg:hidden w-[16%] h-screen bg-primary-black text-gray-200 border-r border-gray-100">
-        <h4 className="mt-7 text-center font-medium text-gray-200">Lecture Management System</h4>
+        <h4 className="mt-7 text-center font-medium text-gray-200">
+            <a href="/">
+            Lecture Management System
+            </a>
+            </h4>
 
         <div className="mt-6 px-5 flex items-center gap-3">
             <div className="w-12 h-12 flex-shrink-0 rounded-full">
