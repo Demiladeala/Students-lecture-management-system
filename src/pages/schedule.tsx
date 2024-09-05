@@ -1,10 +1,10 @@
 import { MdNetworkCheck } from "react-icons/md";
-import ChatPage from "../components/chat-page"
 import Layout from "../components/layout"
 import Sidebar from "../components/side-bar"
 import { useMain } from "../context/MainContext";
+import LecturerSchedule from "../components/lecturer-schedule";
 
-const Chat = () => {
+const Schedule = () => {
   const { userRole } = useMain();
 
   if (userRole === ("" || undefined || null)) {
@@ -23,11 +23,11 @@ const Chat = () => {
   return (
     <main className="relative container w-full mx-auto max-w-[2800px] scroll-smooth">
         <Sidebar/>
-        <Layout noPadding={true}>
-            <ChatPage userType="lecturer" />
+        <Layout>
+            <LecturerSchedule/>
         </Layout>
     </main>
   )
 }
 
-export default Chat
+export default Schedule

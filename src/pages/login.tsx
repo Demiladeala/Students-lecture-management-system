@@ -75,7 +75,7 @@ const Login = () => {
       toast.success("Login successful!");
         setTimeout(() => {
           isLecturer ? 
-        handleRoleChange("lecturer", "/chat") :
+        handleRoleChange("lecturer", "/schedule") :
         handleRoleChange("student", "/dashboard")
       }, 200);
       

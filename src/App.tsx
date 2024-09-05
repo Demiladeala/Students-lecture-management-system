@@ -3,10 +3,11 @@ import Home from "./pages/dashboard"
 import Login from "./pages/login"
 import Calendar from "./pages/calendar"
 import Courses from "./pages/courses"
-import Chat from "./pages/chat"
 import Timetable from "./pages/timetable"
 import Settings from "./pages/settings"
 import Upload from "./pages/upload-courses"
+import Schedule from "./pages/schedule"
+import Chat from "./pages/chat"
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/timetable" element={<Timetable/>} />
         <Route path="/settings" element={<Settings/>} />
         <Route path="/upload-courses" element={<Upload/>} />
+        <Route path="/schedule" element={<Schedule/>} />
       </Routes>
   </main>
   )

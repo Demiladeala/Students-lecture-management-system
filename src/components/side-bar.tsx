@@ -3,19 +3,36 @@ import { useLocation } from "react-router-dom";
 import { FaBook, FaRegCalendarAlt } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LiaHomeSolid } from "react-icons/lia";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { ImBooks } from "react-icons/im";
 import { TiMessages } from "react-icons/ti";
 import { LuTimer } from "react-icons/lu";
 import { useMain } from "../context/MainContext";
 
-const image = "profile-image-1.png";
+type UserDetails = {
+    email?: string; 
+    name?: string; 
+    matricNumber?: string; 
+    level?: string;
+}
 
 const Sidebar = () => {
     const { userRole, loading } = useMain();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [userDetails, setUserDetails] = useState<UserDetails>({});
     // const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
+    let image;
+    userRole ==="student" ?  image = "students.avif" : image = "teacher.svg"
+
+
+    useEffect(() => {
+        // Retrieve userDetails from sessionStorage
+        const storedUserDetails = sessionStorage.getItem("userDetails");
+        if (storedUserDetails) {
+            setUserDetails(JSON.parse(storedUserDetails));
+        }
+    }, []);
 
     if (loading) {
         return null; // Don't render the sidebar while loading
@@ -36,6 +53,7 @@ const Sidebar = () => {
 
      const links = userRole === "registration-officer" || userRole === "lecturer"
     ? [
+        { path: '/schedule', label: 'My Schedule', icon: <FaRegCalendarAlt size={24} /> }, 
         { path: '/chat', label: 'Messages', icon: <TiMessages size={24} /> },
         { path: '/upload-courses', label: 'Upload Courses', icon: <FaBook size={24} /> },
     ]
@@ -83,7 +101,7 @@ const Sidebar = () => {
             </div>
 
             <div className="mt-6 flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full">
+                <div className="w-12 h-12 flex-shrink-0 rounded-full">
                     <motion.img
                         src={image} 
                         alt="profile img" 
@@ -100,8 +118,9 @@ const Sidebar = () => {
                     <h3 className="text-xs text-gray-400">500 level</h3>
                 </div> :
                 <div>
-                    <h4>Mr. Lecturer</h4>    
-                </div>}
+                    <h4>Lecturer</h4>    
+                    <h3 className="text-sm">{userDetails.email}</h3>
+                    </div>}
             </div>
 
             <div className="mt-6 w-full text-sm font-medium">
@@ -134,7 +153,7 @@ const Sidebar = () => {
         <h4 className="mt-7 text-center font-medium text-gray-200">Lecture Management System</h4>
 
         <div className="mt-6 px-5 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full">
+            <div className="w-12 h-12 flex-shrink-0 rounded-full">
                 <motion.img
                     src={image} 
                     alt="profile img" 
@@ -151,11 +170,12 @@ const Sidebar = () => {
                     <h3 className="text-xs text-gray-400">500 level</h3>
                 </div> :
                 <div>
-                    <h4>Mr. Lecturer</h4>    
-                </div>}
+                    <h4>Lecturer</h4>    
+                    <h3 className="text-xs">{userDetails.email}</h3>
+                    </div>}
         </div>
 
-        <div className="mt-16 w-[90%] mx-auto text-sm font-medium">
+        <div className="mt-16 lg:mt-8 xl:mt-16 w-[90%] mx-auto text-sm font-medium">
             {links.map((link, index) => (
                 <a href={link.path} key={index}>
                     <motion.div
