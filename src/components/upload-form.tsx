@@ -4,8 +4,10 @@ import Layout from "./layout";
 import { API } from "./api";
 import * as XLSX from "xlsx";
 import { MdDoNotDisturb } from "react-icons/md";
+import { RiLoader4Fill } from "react-icons/ri";
 
 interface Lecturer {
+  id: number;  // Add lecturer ID
   email: string;
   is_lecturer: boolean;
   is_registration_officer: boolean;
@@ -21,8 +23,8 @@ export interface CourseData {
   venue: string;
   start_time: string;
   end_time: string;
-  lecturer: string;
-  assistants: string[]; // Define assistants as a string array
+  lecturer: number;  // Send lecturer ID
+  assistants: number[];  // Send array of assistant IDs
 }
 
 const UploadForm = () => {
@@ -39,11 +41,12 @@ const UploadForm = () => {
     venue: "",
     start_time: "",
     end_time: "",
-    lecturer: "",
+    lecturer: 0,  // Initialize as 0 (no lecturer selected)
     assistants: [],
   });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const[file, setFile] = useState(false);
 
   // Fetch lecturers when component mounts
   useEffect(() => {
@@ -69,21 +72,23 @@ const UploadForm = () => {
     const { name, value } = e.target;
     setCourseData({
       ...courseData,
-      [name]: value,
+      [name]: name === "level" || name === "lecturer" ? Number(value) : value,  // Ensure lecturer and level are numbers
     });
   };
 
   const handleAssistantsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => Number(option.value));
     setCourseData({ ...courseData, assistants: selectedOptions });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploading(true); // Set loading state to true
     await uploadCourse(courseData);
+    setIsUploading(false); // Set loading state to false after upload
   };
 
-  const uploadCourse = async (course: any) => {
+  const uploadCourse = async (course: CourseData) => {
     try {
       const response = await fetch(`${API}/api/courses`, {
         method: "POST",
@@ -96,35 +101,81 @@ const UploadForm = () => {
 
       if (response.ok) {
         toast.success(`Course ${course.name} uploaded successfully!`);
+        setCourseData({
+          name: "",
+          code: "",
+          level: 100,
+          day: "MON",
+          venue: "",
+          start_time: "",
+          end_time: "",
+          lecturer: 0,
+          assistants: [],
+        }); //cleat course data after success
       } else {
         const errorData = await response.json();
-        toast.error(`Failed to upload course ${course.name}: ${errorData.message || errorData.detail}`);
+        toast.error(`${errorData.message || errorData.detail || errorData.code}`);
+        if(file){
+        toast.error(`Failed to upload course ${course.name}: ${errorData.message || errorData.detail || errorData.code}`);
+        }
       }
     } catch (error) {
       toast.error(`An error occurred while uploading course ${course.name}. Please try again.`);
     }
   };
 
+    // Function to validate if an object is of type CourseData
+  function isValidCourseData(obj: any): obj is CourseData {
+    return (
+      typeof obj.name === "string" &&
+      typeof obj.code === "string" &&
+      typeof obj.level === "number" &&
+      typeof obj.day === "string" &&
+      typeof obj.venue === "string" &&
+      typeof obj.start_time === "string" &&
+      typeof obj.end_time === "string" &&
+      typeof obj.lecturer === "number" &&
+      Array.isArray(obj.assistants) &&
+      obj.assistants.every((id: any) => typeof id === "number")
+    );
+  }
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+  
     const reader = new FileReader();
     reader.onload = async (event) => {
       const data = event.target?.result;
       const workbook = XLSX.read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const courses = XLSX.utils.sheet_to_json(worksheet);
-
+      const parsedCourses = XLSX.utils.sheet_to_json(worksheet);
+  
+      // Check if parsed data is valid
+      const courses: CourseData[] = parsedCourses
+        .filter(isValidCourseData)
+        .map((course) => ({
+          name: course.name,
+          code: course.code,
+          level: course.level,
+          day: course.day,
+          venue: course.venue,
+          start_time: course.start_time.slice(0, 5),
+          end_time: course.end_time.slice(0, 5),
+          lecturer: course.lecturer,
+          assistants: course.assistants,
+        }));
+  
       setIsUploading(true);
       setUploadProgress(0);
-
+  
       for (let i = 0; i < courses.length; i++) {
+        setFile(true);
         await uploadCourse(courses[i]);
         setUploadProgress(((i + 1) / courses.length) * 100);
       }
-
+  
       setIsUploading(false);
       toast.success("All courses uploaded successfully!");
     };
@@ -266,9 +317,9 @@ const UploadForm = () => {
             className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
             required
           >
-            <option value="">Select a lecturer</option>
+            <option value={0}>Select a lecturer</option>
             {lecturers.map((lecturer) => (
-              <option key={lecturer.email} value={lecturer.email}>
+              <option key={lecturer.id} value={lecturer.id}>
                 {lecturer.email}
               </option>
             ))}
@@ -281,12 +332,12 @@ const UploadForm = () => {
           <select
             multiple
             name="assistants"
-            value={courseData.assistants}
+            value={courseData.assistants.map(String)}
             onChange={handleAssistantsChange}
             className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
           >
             {lecturers.map((lecturer) => (
-              <option key={lecturer.email} value={lecturer.email} className="p-3">
+              <option key={lecturer.id} value={lecturer.id} className="p-3">
                 {lecturer.email}
               </option>
             ))}
@@ -295,9 +346,17 @@ const UploadForm = () => {
 
         <button
           type="submit"
-          className="mt-4 px-4 py-2 bg-primary-black text-white rounded-md shadow-sm"
+          className="mt-4 px-4 py-2 bg-primary-black text-white 
+          flex items-center justify-center text-center rounded-md shadow-sm
+          disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={isUploading} // Disable button if isUploading is true
         >
-          Upload Course
+          {isUploading ? 
+          <div className="flex items-center gap-1">
+            <RiLoader4Fill size={25} className="animate-spin"/>
+            Uploading...
+          </div>
+          : "Upload Course"} {/* Show loading text when uploading */}
         </button>
       </form>
 

@@ -64,13 +64,13 @@ const Login = () => {
         withCredentials: true,
       });
 
-    const userDetailsResponse = await axios.get(`${API}/api/users/me`, {
-      withCredentials: true,
-    });
+      const userDetailsResponse = await axios.get(`${API}/api/users/me`, {
+        withCredentials: true,
+      });
 
       // Assuming user details are retrieved successfully
       const userDetails = userDetailsResponse.data;
-        sessionStorage.setItem('userDetails', JSON.stringify(userDetails));
+      sessionStorage.setItem('userDetails', JSON.stringify(userDetails));
 
       toast.success("Login successful!");
         setTimeout(() => {

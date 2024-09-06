@@ -4,6 +4,8 @@ export type ClassDetails = {
     name: string;
     numStudents: number;
     time: string;
+    start_time: string;
+    end_time: string;
     subtitle: string;
   };
 
@@ -95,7 +97,7 @@ const WeeklyCalendar = ({ weekData }: WeeklyCalendarProps) => {
                                                 alt="students" 
                                                 className="w-full h-full object-cover rounded-full border"/>
                                             </div>
-                                            {course.numStudents} Students
+                                            {course.numStudents} {course.start_time} - {course.end_time}
                                         </div>
                                     </div>
                                     <div className={`relative top-[-1rem] pt-5 pb-2 flex items-center justify-end

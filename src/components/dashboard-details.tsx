@@ -15,7 +15,7 @@ const DashboardDetails = () => {
         try {
             const response = await fetch(`${API}/api/courses/get_my_courses_for_the_week`, {
                 method: "GET",
-                credentials: 'include' // Add this if you need to include credentials
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -24,12 +24,21 @@ const DashboardDetails = () => {
 
             const data: any[] = await response.json();
 
+            // Helper function to map day abbreviations and full names
+            const getDayKey = (day: string | string[]) => {
+              if (Array.isArray(day)) {
+                return day[1]; // Return full day name (e.g., "Monday")
+              }
+              return day;
+            };
+
             // Transform the data into the format expected by WeeklyCalendar
             const formattedData: WeekData = data.reduce((acc, { day, courses }) => {
-                acc[day] = {
-                    color: "bg-blue-200", // Default or custom color
-                    subColor: "bg-blue-100", // Default or custom color
-                    spacing: "mt-2", // Default or custom spacing
+                const dayKey = getDayKey(day); // Use the helper function
+                acc[dayKey] = {
+                    color: "bg-blue-200",
+                    subColor: "bg-blue-100",
+                    spacing: "mt-2",
                     courses,
                 };
                 return acc;
@@ -44,7 +53,7 @@ const DashboardDetails = () => {
     };
 
     fetchCoursesForWeek();
-}, []);
+  }, []);
 
   if (loading) {
     return <Loader />
