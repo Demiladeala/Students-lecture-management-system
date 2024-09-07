@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { fetchClassReps, fetchLecturers, fetchPreviousMessages, connectWebSocket } from "../components/api"  // Adjust the import path
 
 export type Message = {
   id: number;
@@ -12,16 +13,65 @@ export type UserType = "student" | "classRep" | "lecturer";
 
 interface MessagesPageProps {
   userType: UserType;
+  userId: number; // Add userId prop to identify current user
 }
 
-const sampleMessages: Message[] = [
-  { id: 1, sender: "Lecturer", content: "Please remember the deadline for assignment submission.", timestamp: "10:30 AM", senderType: "lecturer" },
-  { id: 2, sender: "Class Rep", content: "Noted, sir.", timestamp: "10:35 AM", senderType: "student" },
-  { id: 3, sender: "Lecturer", content: "Don't forget to remind the class.", timestamp: "10:40 AM", senderType: "lecturer" },
-];
-
-const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
+const ChatPage: React.FC<MessagesPageProps> = ({ userType, userId }) => {
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [users, setUsers] = useState<{ classReps: any[], lecturers: any[] }>({ classReps: [], lecturers: [] });
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    // Fetch class reps and lecturers
+    const fetchUsers = async () => {
+      const classReps = await fetchClassReps();
+      const lecturers = await fetchLecturers();
+      setUsers({ classReps, lecturers });
+    };
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (selectedConversation !== null) {
+      // Fetch previous messages
+      const fetchMessages = async () => {
+        const lecturerId = selectedConversation; // Example, adjust as needed
+        const classRepId = userId; // Example, adjust as needed
+        const data = await fetchPreviousMessages(lecturerId, classRepId);
+        setMessages(data.sent_messages.concat(data.received_messages));
+      };
+      fetchMessages();
+    }
+  }, [selectedConversation, userId]);
+
+  useEffect(() => {
+    if (userType === "classRep" || userType === "lecturer") {
+      // Set up WebSocket connection
+      const ws = connectWebSocket(selectedConversation || 0); // Adjust as needed
+      setWebSocket(ws);
+
+      ws.onmessage = (event:any) => {
+        const message = JSON.parse(event.data);
+        setMessages(prevMessages => [...prevMessages, message]);
+      };
+
+      return () => {
+        ws.close();
+      };
+    }
+  }, [userType, selectedConversation]);
+
+  const handleSendMessage = (content: string) => {
+    if (webSocket) {
+      webSocket.send(JSON.stringify({
+        sender: userId,
+        recipient: selectedConversation,
+        text: content,
+        timestamp: new Date().toISOString(),
+      }));
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -29,28 +79,24 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
       <div className={`w-full ${selectedConversation !== null || userType === "student" ? "hidden lg:block" : "max-lg:h-screen"} 
       md:w-1/3 bg-gray-100 p-4 border-r`}>
         <h2 className="text-xl font-bold mb-4 mt-8">Messages</h2>
-       {userType !== "student" ? <ul>
-          {sampleMessages.map((message) => (
+        {userType !== "student" ? <ul>
+          {users.classReps.concat(users.lecturers).map(user => (
             <li
-              key={message.id}
-              className="px-2  py-3 mb-2 bg-white shadow rounded cursor-pointer"
-              onClick={() => setSelectedConversation(message.id)}
+              key={user.id}
+              className="px-2 py-4 mb-2 bg-white text-primary-black shadow rounded cursor-pointer"
+              onClick={() => setSelectedConversation(user.id)}
             >
-              <div className="font-bold">{message.sender}</div>
-              <div className="text-sm text-gray-600 truncate">{message.content}</div>
-              <div className="text-xs text-gray-500 text-right">{message.timestamp}</div>
+              <div className="font-bold text-primary-black">{user.name}</div>
             </li>
           ))}
         </ul> : 
         <div className="font-medium max-lg:hidden">
             You can only chat with lecturers if you are the class representative.
-        </div>
-        }
+        </div>}
       </div>
 
       {/* Message view */}
-      <div className={`flex-1 flex flex-col w-full md:w-2/3
-        ${selectedConversation !== null && userType === "student" ? "hidden" : ""}`}>
+      <div className={`flex-1 flex flex-col w-full md:w-2/3 ${selectedConversation !== null && userType === "student" ? "hidden" : ""}`}>
         {userType === "student" && selectedConversation === null && (
           <div className="p-4 bg-gray-50 h-screen flex flex-col gap-3 items-center justify-center text-center
            text-primary-black text-xl font-semibold">
@@ -79,33 +125,30 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType }) => {
 
         {userType !== "student" && selectedConversation !== null ? (
           <div className="relative flex-1 p-4 pt-12 bg-white overflow-y-auto">
-            {sampleMessages
-              .filter((message) => message.id === selectedConversation)
-              .map((message) => (
-                <div key={message.id} className={`mb-4 ${message.senderType === "lecturer" ? "text-left" : "text-right"}`}>
-                  <div className={`inline-block p-2 rounded-lg 
-                    ${message.senderType === "lecturer" ? "bg-gray-100" : "bg-primary-black/80 text-gray-100"}`}>
-                    <div className="font-bold">{message.sender}</div>
-                    <div>{message.content}</div>
-                    <div className={` text-xs ${message.senderType === "lecturer" ? "text-gray-500" : "text-gray-200"} `}>
-                      {message.timestamp}</div>
-                  </div>
+            {messages.map((message) => (
+              <div key={message.id} className={`mb-4 ${message.senderType === "lecturer" ? "text-left" : "text-right"}`}>
+                <div className={`inline-block p-2 rounded-lg 
+                  ${message.senderType === "lecturer" ? "bg-gray-100" : "bg-primary-black/80 text-gray-100"}`}>
+                  <div className="font-bold">{message.sender}</div>
+                  <div>{message.content}</div>
+                  <div className={` text-xs ${message.senderType === "lecturer" ? "text-gray-500" : "text-gray-200"} `}>
+                    {message.timestamp}</div>
                 </div>
-              ))}
+              </div>
+            ))}
 
             {userType === "classRep" || userType === "lecturer" ? (
-            <div className="w-full md:w-[68%] lg:w-[56%] fixed right-0 bottom-0 p-4 bg-gray-100 border-t flex items-center">
+              <div className="w-full md:w-[68%] lg:w-[56%] fixed right-0 bottom-0 p-4 bg-gray-100 border-t flex items-center">
                 <input
-                type="text"
-                placeholder="Type your message..."
-                className="flex-1 p-2 border rounded-lg"
+                  type="text"
+                  placeholder="Type your message..."
+                  className="flex-1 p-2 border rounded-lg"
                 />
-                <button className="ml-2 p-2 bg-primary-black text-white rounded-lg">Send</button>
-            </div>
+                <button className="ml-2 p-2 bg-primary-black text-white rounded-lg" onClick={() => handleSendMessage("your message here")}>Send</button>
+              </div>
             ) : null}
           </div>
-
-        ) : null }
+        ) : null}
 
         <button
           className="md:hidden bg-gray-200 text-gray-700 p-2 rounded-full absolute top-4 right-4"

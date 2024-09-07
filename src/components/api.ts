@@ -22,4 +22,27 @@ apiClient.interceptors.response.use(
   }
 );
 
+export const fetchClassReps = async () => {
+  const response = await axios.get(`${API}/api/users/get_all_classreps`, {withCredentials:true});
+  return response.data;
+};
+
+export const fetchLecturers = async () => {
+  const response = await axios.get(`${API}/api/users/get_all_lecturers`, {withCredentials:true});
+  return response.data;
+};
+
+export const fetchPreviousMessages = async (lecturerId:number, classRepId:number) => {
+  const response = await axios.get(`${API}/api/chat/${lecturerId}/${classRepId}/previous-messages`, 
+  {withCredentials:true});
+  return response.data;
+};
+
+export const connectWebSocket = (userId:number) => {
+  return new WebSocket(`ws:///ws/chat/${userId}/`);
+};
+
+
+
+
 export default apiClient;

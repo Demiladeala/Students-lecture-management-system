@@ -11,6 +11,7 @@ import { AiOutlineNotification } from "react-icons/ai";
 import { useMain } from "../context/MainContext";
 
 export type UserDetails = {
+    id?: number;
     email?: string; 
     name?: string; 
     matricNumber?: string; 
