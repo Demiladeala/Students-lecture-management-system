@@ -8,6 +8,7 @@ import Settings from "./pages/settings"
 import Upload from "./pages/upload-courses"
 import Schedule from "./pages/schedule"
 import Chat from "./pages/chat"
+import Notice from "./pages/add-notice"
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/settings" element={<Settings/>} />
         <Route path="/upload-courses" element={<Upload/>} />
         <Route path="/schedule" element={<Schedule/>} />
+        <Route path="/add-notice" element={<Notice/>} />
       </Routes>
   </main>
   )

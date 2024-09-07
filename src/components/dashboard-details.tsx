@@ -5,6 +5,7 @@ import { API } from "./api";
 
 const DashboardDetails = () => {
   const [weekData, setWeekData] = useState<WeekData>({});
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +72,26 @@ const DashboardDetails = () => {
       }
     };
 
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`${API}/api/notifications/{id}`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch notifications");
+        }
+
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
     fetchCoursesForWeek();
+    fetchNotifications();
   }, []);
 
   if (loading) {
@@ -79,7 +99,7 @@ const DashboardDetails = () => {
   }
 
   return (
-    <div>
+    <div className="pb-10">
       {/* Courses */}
       <WeeklyCalendar weekData={weekData} />
       {/* Courses */}
@@ -88,21 +108,26 @@ const DashboardDetails = () => {
       <div className="mt-10 bg-white p-4 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-4">Important Notices</h2>
         <div className="space-y-3">
-          <div className="p-3 border border-gray-300 rounded-lg">
-            <div className="flex items-center mb-2">
-              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                Urgent
-              </span>
-              <span className="ml-auto text-gray-500 text-xs">2 hours ago</span>
-            </div>
-            <h3 className="text-lg font-semibold">Change in Exam Schedule</h3>
-            <p className="text-gray-700">
-              The exam for Math 101 has been rescheduled to Friday, 10 AM.
-            </p>
-          </div>
+          {notifications.length ? (
+            notifications.map((notification) => (
+              <div key={notification.id} className="p-3 border border-gray-300 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                    Urgent
+                  </span>
+                  <span className="ml-auto text-gray-500 text-xs">
+                    {new Date(notification.created_at).toLocaleTimeString()}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold">{notification.title}</h3>
+                <p className="text-gray-700">{notification.description}</p>
+              </div>
+            ))
+          ) : (
+            <p>No notices available.</p>
+          )}
         </div>
       </div>
-      {/* Notices */}
     </div>
   );
 };

@@ -7,13 +7,15 @@ import {  useEffect, useState } from "react";
 import { ImBooks } from "react-icons/im";
 import { TiMessages } from "react-icons/ti";
 import { LuTimer } from "react-icons/lu";
+import { AiOutlineNotification } from "react-icons/ai";
 import { useMain } from "../context/MainContext";
 
-type UserDetails = {
+export type UserDetails = {
     email?: string; 
     name?: string; 
     matricNumber?: string; 
     level?: string;
+    is_class_rep ?: boolean;
 }
 
 const Sidebar = () => {
@@ -64,6 +66,8 @@ const Sidebar = () => {
         { path: '/chat', label: 'Messages', icon: <TiMessages size={24}/> },
         { path: '/timetable', label: 'Timetable', icon: <LuTimer size={24}/> },
         { path: '/settings', label: 'Settings', icon: <IoSettingsOutline size={24}/> },
+        ...(!userDetails.is_class_rep ? 
+        [{ path: '/add-notice', label: 'Add Notice', icon: <AiOutlineNotification size={24} /> }] : []),
     ];
 
   return (

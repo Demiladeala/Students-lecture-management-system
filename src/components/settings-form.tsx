@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Layout from "./layout";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 import Loader from "./loader";
@@ -70,7 +69,7 @@ const SettingsForm = () => {
   }
 
   return (
-    <Layout>
+    <div>
       <div className="bg-white text-primary-black p-4 rounded-lg shadow">
         <h1 className="text-2xl font-bold">Notification Settings</h1>
       </div>
@@ -146,7 +145,7 @@ const SettingsForm = () => {
       </div>
 
       <Toaster />
-    </Layout>
+    </div>
   );
 };
 
