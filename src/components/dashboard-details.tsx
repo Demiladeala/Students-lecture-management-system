@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-// import { demoWeekData } from "../util/types-and-links"
-import Layout from "./layout"
 import WeeklyCalendar, { WeekData } from "./weekly-calendar"
 import { API } from "./api";
 import Loader from "./loader";
@@ -60,7 +58,7 @@ const DashboardDetails = () => {
   }
 
   return (
-    <Layout>
+    <div>
       {/* Courses */}
         <WeeklyCalendar weekData={weekData} />
       {/* Courses */}
@@ -81,7 +79,7 @@ const DashboardDetails = () => {
       </div>
 
       {/* Notices */}
-    </Layout>
+    </div>
   )
 }
 
