@@ -70,11 +70,19 @@ const UploadForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+  
+    // Ensure lecturer and level are numbers
+    let newValue = value;
+    if (name === "start_time" || name === "end_time") {
+      // Slice the time to only "hh:mm" if it's in "hh:mm:ss"
+      newValue = value.slice(0, 5);
+    }
+  
     setCourseData({
       ...courseData,
-      [name]: name === "level" || name === "lecturer" ? Number(value) : value,  // Ensure lecturer and level are numbers
+      [name]: name === "level" || name === "lecturer" ? Number(newValue) : newValue,
     });
-  };
+  };  
 
   const handleAssistantsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(e.target.selectedOptions, (option) => Number(option.value));
@@ -222,7 +230,7 @@ const UploadForm = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 pb-12">
+      <form onSubmit={handleSubmit} className="space-y-4 pb-12 overflow-y-auto">
         <label className="block font-semibold text-lg">Upload Course</label>
         <div>
           <label className="block text-sm font-medium">Course Name</label>

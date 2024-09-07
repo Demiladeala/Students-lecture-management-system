@@ -13,16 +13,22 @@ export type Course = {
   end_time: string;
 };
 
+const formatTime = (time: string): string => {
+  const [hour, minute] = time.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+  const formattedMinute = minute.toString().padStart(2, '0');
+  return `${formattedHour}:${formattedMinute} ${period}`;
+};
+
 const CoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
-    // Get user details from sessionStorage
     setLoad(true);
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails') || '{}');
 
-    // Fetch courses by the user's level
     if (userDetails.level) {
       axios.get(`${API}/api/courses/get_courses_by_level`, {
         params: { level: userDetails.level },
@@ -51,7 +57,7 @@ const CoursesPage = () => {
               <h3 className="text-lg font-semibold">{course.code} - {course.name}</h3>
               <p className="text-gray-700">Day: {course.day}</p>
               <p className="text-gray-700">Venue: {course.venue}</p>
-              <p className="text-gray-700">Time: {course.start_time} - {course.end_time}</p>
+              <p className="text-gray-700">Time: {formatTime(course.start_time)} - {formatTime(course.end_time)}</p>
             </div>
           ))
         ) : (
