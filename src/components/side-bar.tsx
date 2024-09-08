@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaBook, FaRegCalendarAlt } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LiaHomeSolid } from "react-icons/lia";
@@ -9,22 +9,36 @@ import { TiMessages } from "react-icons/ti";
 import { LuTimer } from "react-icons/lu";
 import { AiOutlineNotification } from "react-icons/ai";
 import { useMain } from "../context/MainContext";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { API } from "./api";
 
 export type UserDetails = {
     id?: number;
     email?: string; 
     name?: string; 
-    matricNumber?: string; 
+    matric_number?: string; 
     level?: string;
     is_class_rep ?: boolean;
+    is_registration_officer?: boolean;
 }
+
+interface ConfirmModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    loading: boolean;
+  }
 
 const Sidebar = () => {
     const { userRole, loading } = useMain();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [userDetails, setUserDetails] = useState<UserDetails>({});
+    const [logoutLoading, setLogoutLoading] = useState(false); 
     // const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
+    const navigate = useNavigate();
     let image;
     userRole ==="student" ?  image = "students.avif" : image = "teacher.svg"
 
@@ -54,11 +68,45 @@ const Sidebar = () => {
         location.pathname === path ? "bg-primary-gray2 text-white" : "text-gray-600 lg:text-gray-400 hover:text-gray-100"
     }`;
 
+    const logout = async () => {
+        try {
+          setLogoutLoading(true); // Set loading to true when logout starts
+          await axios.post(`${API}/api/auth/logout`, {}, { withCredentials: true });
+          sessionStorage.clear();
+          document.cookie.split(";").forEach((cookie) => {
+            const [name] = cookie.split("=");
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          });
+          toast.success("Logged out successfully");
+          navigate("/");
+        } catch (error) {
+          console.error("Logout failed:", error);
+          toast.error("Logout failed. Please try again.");
+        } finally {
+          setLogoutLoading(false); // Set loading to false after the logout completes
+        }
+      };
+    
+      const openConfirmModal = (): void => {
+        setIsConfirmModalOpen(true);
+      };
+    
+      const closeConfirmModal = (): void => {
+        setIsConfirmModalOpen(false);
+      };
+    
+      const handleConfirmLogout = (): void => {
+        closeConfirmModal();
+        logout();
+      };
+
      const links = userRole === "registration-officer" || userRole === "lecturer"
     ? [
         { path: '/schedule', label: 'My Schedule', icon: <FaRegCalendarAlt size={24} /> }, 
         { path: '/chat', label: 'Messages', icon: <TiMessages size={24} /> },
-        { path: '/upload-courses', label: 'Upload Courses', icon: <FaBook size={24} /> },
+        { path: '/upload-courses', label: 'Upload Courses', icon: <FaBook size={24} /> },   
+        ...(userDetails.is_registration_officer ? 
+            [{ path: '/edit-course', label: 'Edit Courses', icon: <ImBooks size={24} /> }] : []),
     ]
     : [
         { path: '/dashboard', label: 'Overview', icon: <LiaHomeSolid size={24} /> },
@@ -67,7 +115,7 @@ const Sidebar = () => {
         { path: '/chat', label: 'Messages', icon: <TiMessages size={24}/> },
         { path: '/timetable', label: 'Timetable', icon: <LuTimer size={24}/> },
         { path: '/settings', label: 'Settings', icon: <IoSettingsOutline size={24}/> },
-        ...(!userDetails.is_class_rep ? 
+        ...(userDetails.is_class_rep ? 
         [{ path: '/add-notice', label: 'Add Notice', icon: <AiOutlineNotification size={24} /> }] : []),
     ];
 
@@ -93,7 +141,8 @@ const Sidebar = () => {
     </div>
 
     {/* Mobile Menu */}
-    <div className={`fixed inset-0 z-40 bg-white px-5 border-r border-gray-100 text-primary-black lg:hidden transform ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out`}>
+    <div className={`fixed inset-0 z-40 bg-white px-5 border-r border-gray-100 text-primary-black lg:hidden transform 
+      ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out`}>
         <div className="w-full h-full">
             <div className="px-1 py-3 flex items-center justify-end">
                 <button onClick={() => setIsMobileMenuOpen(false)} 
@@ -118,9 +167,9 @@ const Sidebar = () => {
                 </div>
 
                {userRole === "student" ? <div>
-                    <h4 className="font-semibold">Emzzy</h4>
-                    <h3 className="text-sm">CSC/19/2945</h3>
-                    <h3 className="text-xs text-gray-400">500 level</h3>
+                    <h4 className="font-semibold">{userDetails.email}</h4>
+                    <h3 className="text-sm">{userDetails.matric_number}</h3>
+                    <h3 className="text-xs text-gray-400">{userDetails.level} level</h3>
                 </div> :
                 <div>
                     <h4>Lecturer</h4>    
@@ -147,6 +196,18 @@ const Sidebar = () => {
                         </motion.div>
                     </a>
                 ))}
+
+                {/* Logout Button */}
+                <div className="mt-4">
+                    <button
+                         onClick={openConfirmModal}
+                        className="w-full flex items-center gap-2 transition-all duration-300 py-3 px-4 
+                        rounded-lg bg-red-50 text-red-600 hover:text-red-800 hover:bg-red-100"
+                    >
+                        <span className="text-red-600 font-semibold">Logout</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -174,9 +235,9 @@ const Sidebar = () => {
             </div>
 
                {userRole === "student" ? <div>
-                    <h4 className="font-semibold">Emzzy</h4>
-                    <h3 className="text-sm">CSC/19/2945</h3>
-                    <h3 className="text-xs text-gray-400">500 level</h3>
+                    <h4 className="font-semibold">{userDetails.email}</h4>
+                    <h3 className="text-sm">{userDetails.matric_number}</h3>
+                    <h3 className="text-xs text-gray-400">{userDetails.level} level</h3>
                 </div> :
                 <div>
                     <h4>Lecturer</h4>    
@@ -203,10 +264,65 @@ const Sidebar = () => {
                     </motion.div>
                 </a>
             ))}
+
+            {/* Logout Button */}
+            <div className="mt-4">
+                <button
+                     onClick={openConfirmModal}
+                    className="w-full flex items-center gap-2 transition-all duration-300 py-3 px-4 rounded-lg
+                    bg-red-50 text-red-600 hover:text-red-800 hover:bg-red-100"
+                >
+                    <span className="text-red-600 font-semibold">Logout</span>
+                </button>
+            </div>
         </div>
         </div>
+
+
+        <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={closeConfirmModal}
+        onConfirm={handleConfirmLogout}
+        loading={logoutLoading}
+      />
     </>
   )
 }
 
 export default Sidebar
+
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm, loading }) => {
+    if (!isOpen) return null;
+  
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-lg font-semibold mb-4">Confirm Logout</h2>
+          <p className="mb-6">Are you sure you want to log out?</p>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={onClose}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              disabled={loading} // Disable during loading
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className={`bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center justify-center ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading} // Disable during loading
+            >
+              {loading ? (
+                <span className="loader"></span> // Show a spinner during loading
+              ) : (
+                "Logout"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };

@@ -9,6 +9,7 @@ import Upload from "./pages/upload-courses"
 import Schedule from "./pages/schedule"
 import Chat from "./pages/chat"
 import Notice from "./pages/add-notice"
+import EditCourse from "./pages/edit-course"
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/upload-courses" element={<Upload/>} />
         <Route path="/schedule" element={<Schedule/>} />
         <Route path="/add-notice" element={<Notice/>} />
+        <Route path="/edit-course" element={<EditCourse/>} />
       </Routes>
   </main>
   )
