@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Loader from "./loader";
-import apiClient, { API } from "./api";
+import { API } from "./api";
 import toast from "react-hot-toast";
 import axios from "axios";
 
