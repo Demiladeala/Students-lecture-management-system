@@ -144,7 +144,8 @@ const ChatPage: React.FC<MessagesPageProps> = ({ userType, userId }) => {
                   placeholder="Type your message..."
                   className="flex-1 p-2 border rounded-lg"
                 />
-                <button className="ml-2 p-2 bg-primary-black text-white rounded-lg" onClick={() => handleSendMessage("your message here")}>Send</button>
+                <button className="ml-2 p-2 bg-primary-black text-white rounded-lg" 
+                onClick={() => handleSendMessage("your message here")}>Send</button>
               </div>
             ) : null}
           </div>
