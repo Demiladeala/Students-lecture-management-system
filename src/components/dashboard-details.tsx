@@ -66,6 +66,7 @@ const DashboardDetails = () => {
 
         setWeekData(formattedData);
       } catch (error) {
+        
         console.error("Error fetching courses:", error);
       } finally {
         setLoading(false);
@@ -74,7 +75,7 @@ const DashboardDetails = () => {
 
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`${API}/api/notifications/{id}`, {
+        const response = await fetch(`${API}/api/notifications`, {
           method: "GET",
           credentials: "include",
         });

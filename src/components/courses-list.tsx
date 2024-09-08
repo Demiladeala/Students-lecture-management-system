@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Loader from "./loader";
-import { API } from "./api";
+import apiClient, { API } from "./api";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 export type Course = {
   id: number;
@@ -29,6 +30,12 @@ const CoursesPage = () => {
     setLoad(true);
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails') || '{}');
 
+    if (!userDetails.level) {
+      toast.error("Session expired. Please log in again.");
+      window.location.href = '/'; // Redirect to login
+      return;
+    }
+
     if (userDetails.level) {
       axios.get(`${API}/api/courses/get_courses_by_level`, {
         params: { level: userDetails.level },
@@ -39,8 +46,20 @@ const CoursesPage = () => {
         setLoad(false);
       })
       .catch(error => {
-        console.error('Error fetching courses:', error);
-        setLoad(false);
+        const { status } = error.response;
+        if (status === 401) {
+          console.log('401 detected. Clearing cookies and redirecting.');
+          toast.error('Session expired. Please log in again.');
+    
+          // Clear cookies
+          document.cookie.split(";").forEach((cookie) => {
+            const [name] = cookie.split("=");
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+            console.log(`Cleared cookie: ${name}`);
+          });
+          console.error('Error fetching courses:', error);
+          setLoad(false);
+        }
       });
     }
   }, []);

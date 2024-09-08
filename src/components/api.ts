@@ -13,16 +13,18 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Show toast notification
+      console.log('401 detected. Clearing cookies and redirecting.');
       toast.error('Session expired. Please log in again.');
 
       // Clear cookies
       document.cookie.split(";").forEach((cookie) => {
         const [name] = cookie.split("=");
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        console.log(`Cleared cookie: ${name}`);
       });
 
       // Redirect to login page
-      window.location.assign('/');
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

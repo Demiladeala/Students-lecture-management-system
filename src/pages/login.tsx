@@ -82,6 +82,19 @@ const Login = () => {
     } catch (error: any) {
       if (error.response) {
         const { status, data } = error.response;
+        if (status === 401) {
+          toast.error("Session expired. Please log in again.");
+
+           // Clear cookies
+          document.cookie.split(";").forEach((cookie) => {
+            const [name] = cookie.split("=");
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+            console.log(`Cleared cookie: ${name}`);
+          });
+          
+          window.location.href = '/'; // Redirect to login
+          return;
+        }
         if (status === 400 || status === 404) {
           // Display the error message from the API response
           const errorMessage = data.username || data.error || data.detail || 'An error occurred. Please try again.';
