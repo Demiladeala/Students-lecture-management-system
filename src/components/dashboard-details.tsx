@@ -40,7 +40,7 @@ const DashboardDetails = () => {
 
         // Define colors for each day
         const colors: Record<string, { color: string; subColor: string; spacing:string }> = {
-          Monday: { color: "bg-[#FF823F]", subColor: "bg-[#FFDAC5]", spacing:"lg:mt-40" },
+          Monday: { color: "bg-[#FF823F]", subColor: "bg-[#FFDAC5]", spacing:"lg:mt-4" },
           Tuesday: { color: "bg-[#F5BB23]", subColor: "bg-[#FDEABD]", spacing:"lg:mt-16" },
           Wednesday: { color: "bg-[#FFA7A7]", subColor: "bg-[#FFE5E6]", spacing:"" },
           Thursday: { color: "bg-[#0DBDF6]", subColor: "bg-[#B7EBFC]", spacing:"lg:mt-24" },
@@ -54,7 +54,6 @@ const DashboardDetails = () => {
           const dayKey = getDayKey(day) as keyof typeof colors; // Use type assertion here
           acc[dayKey] = {
             ...colors[dayKey], // Use the predefined colors
-            spacing: dayKey === "Sunday" ? "" : "mt-2",
             courses: courses.map((course: any) => ({
               ...course,
               start_time: formatTime(course.start_time),

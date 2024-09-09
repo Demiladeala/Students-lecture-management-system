@@ -19,15 +19,31 @@ const ChatPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedUserId !== null && currentUser) {
-      const websocket = createWebSocketConnection(selectedUserId);
-      setWs(websocket);
-
-      return () => {
-        websocket.close();
-      };
+    async function connectWebSocket() {
+      if (selectedUserId !== null && currentUser) {
+        try {
+          const websocket = await createWebSocketConnection(selectedUserId);
+          setWs(websocket);
+  
+          websocket.onopen = () => {
+            console.log('WebSocket connection opened');
+          };
+  
+          websocket.onclose = () => {
+            console.log('WebSocket connection closed');
+          };
+  
+          return () => {
+            websocket.close();
+          };
+        } catch (error) {
+          console.error('Error connecting WebSocket', error);
+        }
+      }
     }
-  }, [selectedUserId, currentUser]);
+  
+    connectWebSocket();
+  }, [selectedUserId, currentUser]);  
 
   if (!currentUser) return <Loader/>;
   if (!currentUser.is_class_rep && !currentUser.is_lecturer) {
@@ -47,7 +63,7 @@ const ChatPage: React.FC = () => {
     <div className="flex h-screen">
       <ChatSidebar currentUserId={currentUser.id} onSelectUser={setSelectedUserId} />
       {(selectedUserId !== null && ws) ? (
-        <ChatMessages otherUserId={selectedUserId} ws={ws} />) :
+        <ChatMessages otherUserId={selectedUserId} currentUserId={currentUser.id} ws={ws} />) :
         <div className="p-4 bg-gray-50 w-full h-screen overflow-y-auto flex flex-col 
         gap-3 items-center justify-center text-center
           text-primary-black text-xl font-semibold">

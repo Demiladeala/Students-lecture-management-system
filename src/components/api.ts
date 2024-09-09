@@ -63,8 +63,35 @@ export async function getCurrentUser(): Promise<User> {
 
 // Fetch previous messages
 export async function getPreviousMessages(otherUserId: number): Promise<MessagesResponse> {
-  const response = await axios.get<MessagesResponse>(`${API}/api/chat/${otherUserId}/previous-messages`, {withCredentials:true});
-  return response.data;
+  const response = await axios.get<MessagesResponse>(`${API}/api/chat/${otherUserId}/previous-messages`, { withCredentials: true });
+  
+  // Parse sent messages
+  const parsedSentMessages = response.data.sent_messages.map(msg => {
+    const parsedText = JSON.parse(msg.text);
+    return {
+      ...parsedText,
+      id: msg.id,
+      sender: msg.sender,  // Ensure sender ID is preserved correctly
+      timestamp: parsedText.timestamp || msg.timestamp // Use timestamp from parsed text if available
+    };
+  });
+
+  // Parse received messages
+  const parsedReceivedMessages = response.data.received_messages.map(msg => {
+    const parsedText = JSON.parse(msg.text);
+    return {
+      ...parsedText,
+      id: msg.id,
+      sender: msg.sender,  // Ensure sender ID is preserved correctly
+      timestamp: parsedText.timestamp || msg.timestamp // Use timestamp from parsed text if available
+    };
+  });
+
+  return {
+    ...response.data,
+    sent_messages: parsedSentMessages,
+    received_messages: parsedReceivedMessages
+  };
 }
 
 // Fetch all class representatives
@@ -79,14 +106,26 @@ export async function getAllLecturers(): Promise<User[]> {
   return response.data;
 }
 
-// WebSocket connection
-export function createWebSocketConnection(otherUserId: number): WebSocket {
-  const wsUrl = `ws://lecture-management-system.onrender.com/ws/chat/${otherUserId}`;
-  const ws = new WebSocket(wsUrl);
+export async function getSessionToken() {
+  const response = await axios.get<{ session_token: string }>(`${API}/api/users/get_session_token`, {withCredentials:true});
+  return response.data;
+}
 
-  ws.onopen = () => console.log('WebSocket connection established');
-  ws.onclose = () => console.log('WebSocket connection closed');
-  ws.onerror = (error) => console.error('WebSocket error:', error);
+// WebSocket connection with session token
+export async function createWebSocketConnection(otherUserId: number): Promise<WebSocket> {
+  try {
+    const { session_token } = await getSessionToken();
+    const wsUrl = `wss://lecture-management-system.onrender.com/ws/chat/${otherUserId}?session_token=${session_token}`;
+    
+    const ws = new WebSocket(wsUrl);
 
-  return ws;
+    ws.onopen = () => console.log('WebSocket connection established');
+    ws.onclose = () => console.log('WebSocket connection closed');
+    ws.onerror = (error) => console.error('WebSocket error:', error);
+
+    return ws;
+  } catch (error) {
+    console.error('Error creating WebSocket connection:', error);
+    throw error;  // You can also handle this error better in the component if needed
+  }
 }

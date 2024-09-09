@@ -4,17 +4,26 @@ import { getPreviousMessages } from './api';
 interface ChatMessagesProps {
   otherUserId: number;
   ws: WebSocket | null;
+  currentUserId: number;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws, currentUserId }) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
 
   // Fetch previous messages on mount
   useEffect(() => {
     async function fetchMessages() {
-      const response = await getPreviousMessages(otherUserId);
-      setMessages([...response.sent_messages, ...response.received_messages]);
+      try {
+        const response = await getPreviousMessages(otherUserId);
+        const combinedMessages = [
+          ...response.sent_messages,
+          ...response.received_messages
+        ];
+        setMessages(combinedMessages);
+      } catch (error) {
+        console.error('Error fetching previous messages:', error);
+      }
     }
     fetchMessages();
   }, [otherUserId]);
@@ -31,7 +40,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws }) => {
 
   const handleSend = () => {
     if (ws && newMessage.trim()) {
-      const message = { text: newMessage, recipient: otherUserId, sender: 0, timestamp: new Date().toISOString() }; // Placeholder sender ID
+      const message = { text: newMessage, recipient: otherUserId, sender: currentUserId, timestamp: new Date().toISOString() };
       setMessages((prevMessages) => [...prevMessages, message]);  // Optimistically update the UI
 
       ws.send(JSON.stringify(message)); // Send the message via WebSocket
@@ -39,8 +48,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws }) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent the default Enter key action (like form submission)
+      handleSend();
+    }
+  };
+
   return (
-    <div className="w-full flex-1 p-4 flex flex-col max-lg:pt-10">
+    <div className="lg:w-full w-[150%] flex-1 p-4 flex flex-col max-lg:pt-10">
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="p-4 bg-gray-50 h-[80vh] flex flex-col gap-3 items-center justify-center text-center
@@ -52,11 +68,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws }) => {
           </div>
         ) : (
           messages.map((msg, idx) => (
-            <div key={idx} className={`w-full p-2 ${msg.sender === otherUserId ? 'text-left' : 'text-right'}`}>
-              <div className="bg-[#F9FAFB] p-2 rounded-lg inline-block">
+            <div key={idx} className={`w-full p-2 ${msg.sender === currentUserId ? 'text-right' : 'text-left'}`}>
+              <div className={`bg-[#F9FAFB] p-2 rounded-lg inline-block 
+                ${msg.sender === currentUserId ? 'bg-gray-100' : 'bg-blue-100'}`}>
                 {msg.text}
               </div>
-              <div className="text-xs text-gray-500">{new Date(msg.timestamp).toLocaleTimeString()}</div>
+              <div className="text-xs text-gray-500">{new Date(msg.timestamp).toLocaleTimeString('en-US', 
+              { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
             </div>
           ))
         )}
@@ -66,6 +84,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws }) => {
         <input
           type="text"
           value={newMessage}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setNewMessage(e.target.value)}
           className="flex-1 p-2 border border-gray-300"
         />
