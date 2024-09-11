@@ -19,7 +19,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws, currentUse
         const combinedMessages = [
           ...response.sent_messages,
           ...response.received_messages
-        ];
+        ].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()); // Sort by timestamp
         setMessages(combinedMessages);
       } catch (error) {
         console.error('Error fetching previous messages:', error);
@@ -29,14 +29,42 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ otherUserId, ws, currentUse
   }, [otherUserId]);
 
   // Listen for incoming messages via WebSocket
-  useEffect(() => {
-    if (ws) {
-      ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, message]);
-      };
-    }
-  }, [ws]);
+// Listen for incoming messages via WebSocket
+useEffect(() => {
+  if (ws) {
+    ws.onmessage = (event) => {
+      let message;
+
+      // Try parsing the message if it's a stringified object
+      try {
+        const data = JSON.parse(event.data);
+
+        // Check if the message is in the nested format
+        if (typeof data.message === 'string') {
+          message = JSON.parse(data.message);
+        } else {
+          message = data;
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+        return;
+      }
+
+      // Ensure message has necessary fields
+      if (message && message.text && message.timestamp) {
+        setMessages((prevMessages) => {
+          // Filter out duplicate messages
+          const uniqueMessages = prevMessages.filter(
+            (msg) => !(msg.timestamp === message.timestamp && msg.sender === message.sender)
+          );
+          const updatedMessages = [...uniqueMessages, message]
+            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()); // Sort by timestamp
+          return updatedMessages;
+        });
+      }
+    };
+  }
+}, [ws]);
 
   const handleSend = () => {
     if (ws && newMessage.trim()) {

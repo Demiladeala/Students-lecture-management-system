@@ -86,13 +86,13 @@ const Login = () => {
           toast.error("Session expired. Please log in again.");
 
            // Clear cookies
-          document.cookie.split(";").forEach((cookie) => {
+           document.cookie.split(";").forEach((cookie) => {
             const [name] = cookie.split("=");
-            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-            console.log(`Cleared cookie: ${name}`);
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
           });
           
-          window.location.href = '/'; // Redirect to login
+          
+          // window.location.href = '/'; // Redirect to login
           return;
         }
         if (status === 400 || status === 404) {
